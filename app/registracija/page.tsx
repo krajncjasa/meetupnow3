@@ -2,13 +2,13 @@
 
 import { useState, ChangeEvent, FormEvent } from "react";
 import Image from "next/image";
-import meetupnow from "./../../public/registracija/meetupnow.png";
+import meetupnow from "./../../public/meetupnow.png";
 
 export default function Register() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    password: "",
+    password: "", 
     confirmPassword: "",
   });
 
