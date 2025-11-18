@@ -4,19 +4,23 @@ import bcrypt from "bcrypt";
 
 export async function POST(req: Request) {
   try {
+    // 1️⃣ Pridobi podatke iz requesta
     const { name, email, password } = await req.json();
 
     if (!name || !email || !password) {
-      return NextResponse.json({ error: "Manjkajo podatki." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Manjkajo podatki (name, email ali password)." },
+        { status: 400 }
+      );
     }
 
-    // 1) Ustvari supabase client z service role key
+    // 2️⃣ Ustvari Supabase client z service role key
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // 2) Ustvari uporabnika v Supabase Auth
+    // 3️⃣ Ustvari uporabnika v Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
       email,
       password,
@@ -29,14 +33,15 @@ export async function POST(req: Request) {
 
     const userId = authData.user.id;
 
-    // 3) Hash geslo (nikoli ne shranjuj plain text)
+    // 4️⃣ Hash geslo
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 4) Vstavi v tabelo User
+    // 5️⃣ Vstavi uporabnika v tabelo "users" skupaj z email
     const { error: userError } = await supabase.from("users").insert([
       {
         id: userId,
         name,
+        email, // ⬅️ dodano email
         password: hashedPassword,
         created_at: new Date().toISOString(),
       },
@@ -46,6 +51,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: userError.message }, { status: 400 });
     }
 
+    // 6️⃣ Uspeh
     return NextResponse.json({ message: "Registracija uspešna!" });
   } catch (err) {
     console.error("API error:", err);
