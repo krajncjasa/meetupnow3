@@ -47,7 +47,7 @@ export default function Login() {
 
       // ⭐ Preusmeritev po uspehu
       setTimeout(() => {
-        router.push("/dashboard"); // ali katero koli stran po prijavi
+        router.push("/dogodki"); // ali katero koli stran po prijavi
       }, 1500);
 
     } catch (err) {
