@@ -22,7 +22,7 @@ export default function SideNav() {
       <ul className="flex flex-col gap-4 text-lg text-black">
         <li>
           <Link
-            href="/bivsi-dogodki"
+            href="/bivsi_dogodki"
             className="block py-2 px-3 rounded hover:bg-gray-200 transition"
           >
             Bivši dogodki
@@ -31,7 +31,7 @@ export default function SideNav() {
 
         <li>
           <Link
-            href="/bivsi-objavljeni-dogodki"
+            href="/bivsi_objavljeni_dogodki"
             className="block py-2 px-3 rounded hover:bg-gray-200 transition"
           >
             Bivši objavljeni dogodki
@@ -40,7 +40,7 @@ export default function SideNav() {
 
         <li>
           <Link
-            href="/ustvari-dogodek"
+            href="/ustvari_dogodek"
             className="block py-2 px-3 rounded hover:bg-gray-200 transition"
           >
             Ustvari dogodek
