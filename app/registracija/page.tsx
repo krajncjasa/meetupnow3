@@ -2,13 +2,16 @@
 
 import { useState, ChangeEvent, FormEvent } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import meetupnow from "./../../public/meetupnow.png";
 
 export default function Register() {
+  const router = useRouter();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    password: "", 
+    password: "",
     confirmPassword: "",
   });
 
@@ -19,42 +22,46 @@ export default function Register() {
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  const { name, email, password, confirmPassword } = formData;
+    e.preventDefault();
+    const { name, email, password, confirmPassword } = formData;
 
-  if (!name || !email || !password || !confirmPassword) {
-    setMessage("Prosimo, izpolnite vsa polja.");
-    return;
-  }
-
-  if (password !== confirmPassword) {
-    setMessage("Gesli se ne ujemata.");
-    return;
-  }
-
-  try {
-    const res = await fetch("/api/registracija", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      setMessage(data.error || "Napaka pri registraciji.");
+    if (!name || !email || !password || !confirmPassword) {
+      setMessage("Prosimo, izpolnite vsa polja.");
       return;
     }
 
-    setMessage("Registracija uspešna!");
-    setFormData({ name: "", email: "", password: "", confirmPassword: "" });
-  } catch (err) {
-    console.error(err);
-    setMessage("Napaka pri povezavi z strežnikom.");
-  }
-};
+    if (password !== confirmPassword) {
+      setMessage("Gesli se ne ujemata.");
+      return;
+    }
 
-  
+    try {
+      const res = await fetch("/api/registracija", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setMessage(data.error || "Napaka pri registraciji.");
+        return;
+      }
+
+      setMessage("Registracija uspešna!");
+      setFormData({ name: "", email: "", password: "", confirmPassword: "" });
+
+      // ⭐ Preusmeritev po uspehu
+      setTimeout(() => {
+        router.push("/prijava");
+      }, 1500);
+
+    } catch (err) {
+      console.error(err);
+      setMessage("Napaka pri povezavi z strežnikom.");
+    }
+  };
 
   return (
     <div className="relative min-h-screen bg-gray-100 flex items-center justify-center">
@@ -70,7 +77,11 @@ export default function Register() {
         </h2>
 
         {message && (
-          <div className="mb-4 p-2 text-center text-white bg-red-500 rounded">
+          <div
+            className={`mb-4 p-2 text-center text-white rounded ${
+              message === "Registracija uspešna!" ? "bg-green-500" : "bg-red-500"
+            }`}
+          >
             {message}
           </div>
         )}
@@ -133,6 +144,14 @@ export default function Register() {
             Registriraj se
           </button>
         </form>
+
+        {/* ⭐ Dodan gumb za preusmeritev na login */}
+        <button
+          onClick={() => router.push("/prijava")}
+          className="w-full mt-4 py-2 px-4 bg-gray-300 text-black rounded-lg hover:bg-gray-400 transition-colors"
+        >
+          Že imaš profil? Prijavi se
+        </button>
       </div>
     </div>
   );

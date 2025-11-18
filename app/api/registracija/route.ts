@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // 4) Vstavi v tabelo User
-    const { error: userError } = await supabase.from("User").insert([
+    const { error: userError } = await supabase.from("users").insert([
       {
         id: userId,
         name,
