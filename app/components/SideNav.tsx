@@ -20,6 +20,16 @@ export default function SideNav() {
 
       {/* Linki */}
       <ul className="flex flex-col gap-4 text-lg text-black">
+
+        <li>
+          <Link
+            href="/dogodki"
+            className="block py-2 px-3 rounded hover:bg-gray-200 transition"
+          >
+            Izpis dogodkov
+          </Link>
+        </li>
+
         <li>
           <Link
             href="/bivsi_dogodki"
