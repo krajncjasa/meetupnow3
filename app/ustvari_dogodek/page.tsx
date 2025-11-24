@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import SideNav from "../components/SideNav";
 import meetupnow from "../../public/meetupnow.png";
 
@@ -41,13 +40,16 @@ export default function NovDogodek() {
     }
   };
 
+  // Trenutni čas v formatu za min atribut
+  const minDateTime = new Date().toISOString().slice(0, 16);
+
   return (
     <div className="flex">
       <SideNav />
 
       <div className="ml-0 md:ml-64 relative min-h-screen bg-gray-100 p-6 w-full">
         <div className="absolute top-4 right-4 w-48 h-48 md:w-64 md:h-64">
-          <Image src={meetupnow} alt="Meetup Now" className="object-contain" />
+          <img src={meetupnow.src} alt="Meetup Now" className="object-contain w-full h-full" />
         </div>
 
         <h2 className="text-3xl font-bold text-center text-black mb-8">
@@ -121,6 +123,7 @@ export default function NovDogodek() {
               name="cas_dogodka"
               required
               className="w-full p-2 border rounded"
+              min={minDateTime} // omejitev na prihodnje datume
             />
           </div>
 
