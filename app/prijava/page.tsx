@@ -7,12 +7,7 @@ import meetupnow from "./../../public/meetupnow.png";
 
 export default function Login() {
   const router = useRouter();
-
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [message, setMessage] = useState<string>("");
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -42,14 +37,13 @@ export default function Login() {
         return;
       }
 
+      // ⭐ Shrani user_id za uporabo pri prijavi na dogodek
+      localStorage.setItem("user_id", data.user.id);
+
       setMessage("Prijava uspešna!");
       setFormData({ email: "", password: "" });
 
-      // ⭐ Preusmeritev po uspehu
-      setTimeout(() => {
-        router.push("/dogodki"); // ali katero koli stran po prijavi
-      }, 1500);
-
+      setTimeout(() => router.push("/dogodki"), 1500);
     } catch (err) {
       console.error(err);
       setMessage("Napaka pri povezavi z strežnikom.");
@@ -58,23 +52,15 @@ export default function Login() {
 
   return (
     <div className="relative min-h-screen bg-gray-100 flex items-center justify-center">
-      {/* Desna slika */}
       <div className="absolute top-4 right-4 w-48 h-48 md:w-64 md:h-64">
         <Image src={meetupnow} alt="Meetup Now" className="object-contain" />
       </div>
 
-      {/* Prijavni kvadrat */}
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md z-10">
-        <h2 className="text-2xl font-bold mb-6 text-center text-black">
-          Prijava
-        </h2>
+        <h2 className="text-2xl font-bold mb-6 text-center text-black">Prijava</h2>
 
         {message && (
-          <div
-            className={`mb-4 p-2 text-center text-white rounded ${
-              message === "Prijava uspešna!" ? "bg-green-500" : "bg-red-500"
-            }`}
-          >
+          <div className={`mb-4 p-2 text-center text-white rounded ${message === "Prijava uspešna!" ? "bg-green-500" : "bg-red-500"}`}>
             {message}
           </div>
         )}
@@ -88,7 +74,6 @@ export default function Login() {
               value={formData.email}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-black rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-black"
-              placeholder="tvoj@email.com"
             />
           </div>
 
@@ -100,7 +85,6 @@ export default function Login() {
               value={formData.password}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-black rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-black"
-              placeholder="Geslo"
             />
           </div>
 
@@ -112,7 +96,6 @@ export default function Login() {
           </button>
         </form>
 
-        {/* ⭐ Dodan gumb za preusmeritev na registracijo */}
         <button
           onClick={() => router.push("/registracija")}
           className="w-full mt-4 py-2 px-4 bg-gray-300 text-black rounded-lg hover:bg-gray-400 transition-colors"
