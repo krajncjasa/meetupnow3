@@ -7,18 +7,20 @@ export default function SideNav() {
   const router = useRouter();
 
   const handleLogout = () => {
-    // Odjava – izbriše localStorage/session po potrebi
-    localStorage.removeItem("user");
-    router.push("/login");
+    // ⭐ Odjava – izbriše vse uporabniške podatke iz localStorage
+    localStorage.removeItem("user");       // če shranjaš objekt uporabnika
+    localStorage.removeItem("user_id");    // če shranjaš user_id
+    // lahko po potrebi dodaš še druge ključe, povezane s sejo
+
+    // Preusmeri na login
+    router.push("/prijava");
   };
 
   return (
     <nav className="h-screen w-64 bg-white shadow-lg fixed left-0 top-0 p-6 flex flex-col">
       
-      {/* Naslov ali logo */}
       <h2 className="text-2xl font-bold text-black mb-10">Navigacija</h2>
 
-      {/* Linki */}
       <ul className="flex flex-col gap-4 text-lg text-black">
 
         <li>
