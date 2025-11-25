@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import meetupnow from "./../../public/meetupnow.png";
 import SideNav from "../components/SideNav";
 
@@ -19,6 +20,7 @@ type Dogodek = {
 
 export default function Dogodki() {
   const [dogodki, setDogodki] = useState<Dogodek[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchDogodki = async () => {
@@ -62,7 +64,8 @@ export default function Dogodki() {
           {dogodki.map((dogodek) => (
             <div
               key={dogodek.id}
-              className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow"
+              onClick={() => router.push(`/prikaz_dogodka/${dogodek.id}`)}
+              className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow cursor-pointer"
             >
               {/* 🔹 SLIKA IZ SUPABASE BUCKETA */}
               <div className="w-full h-40 mb-3">

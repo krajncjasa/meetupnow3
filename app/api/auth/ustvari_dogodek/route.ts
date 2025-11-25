@@ -12,26 +12,33 @@ export async function POST(req: Request) {
     const kraj = formData.get("kraj") as string;
     const cas_dogodka = formData.get("cas_dogodka") as string;
 
+    const lat = parseFloat(formData.get("lat") as string);
+    const lng = parseFloat(formData.get("lng") as string);
+
     const file = formData.get("slika") as File | null;
 
     if (!file) {
       return NextResponse.json({ error: "Slika ni bila naložena." }, { status: 400 });
     }
 
-    // 1) USTVARIMO SUPABASE CLIENT
+    if (!lat || !lng) {
+      return NextResponse.json({ error: "Lokacija ni izbrana." }, { status: 400 });
+    }
+
+    // SUPABASE
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY! // potreben za storage upload
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // 2) SHANIMO SLIKO V STORAGE "slike"
+    // SLKA UPLOAD
     const ext = file.name.split(".").pop();
     const fileName = `${Date.now()}.${ext}`;
 
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from("slike")
       .upload(fileName, buffer, {
         contentType: file.type,
@@ -39,18 +46,16 @@ export async function POST(req: Request) {
       });
 
     if (uploadError) {
-      console.error(uploadError);
       return NextResponse.json({ error: uploadError.message }, { status: 500 });
     }
 
-    // 3) PRIDOBIMO JAVNI URL SLIKE
     const { data: publicUrlData } = supabase.storage
       .from("slike")
       .getPublicUrl(fileName);
 
     const imageUrl = publicUrlData.publicUrl;
 
-    // 4) ZAPIŠEMO DOGODEK V BAZO
+    // ZAPIS V BAZO
     const { data, error } = await supabase
       .from("dogodki")
       .insert([
@@ -61,6 +66,8 @@ export async function POST(req: Request) {
           cas_dogodka,
           slika: fileName,
           status: "odobreno",
+          lat,
+          lng,
         },
       ])
       .select();
