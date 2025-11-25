@@ -1,119 +1,106 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
-
-// Hook za nalaganje Google Maps
-function useGoogleMaps(apiKey: string) {
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    // Če je Google Maps že naložen
-    if ((window as any).google) {
-      setLoaded(true);
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}`;
-    script.async = true;
-    script.defer = true;
-    script.onload = () => setLoaded(true);
-
-    document.head.appendChild(script);
-
-    // Ne odstranjuj script ob unmount, da ne naloži ponovno
-  }, [apiKey]);
-
-  return loaded;
-}
+import SideNav from "../../components/SideNav";
+import useGoogleMaps from "../../hooks/useGoogleMaps";
 
 export default function PodrobnostiDogodka() {
   const { id } = useParams();
   const [dogodek, setDogodek] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   const mapRef = useRef<HTMLDivElement | null>(null);
-  const markerRef = useRef<any>(null);
-  const mapInstanceRef = useRef<any>(null);
+  const mapInstance = useRef<google.maps.Map | null>(null);
+  const marker = useRef<google.maps.Marker | null>(null);
 
   const mapLoaded = useGoogleMaps(process.env.NEXT_PUBLIC_MAPS_KEY!);
 
-  // 🔹 1) Naloži podatke o dogodku
+  // Naloži podatke o dogodku
   useEffect(() => {
     const loadData = async () => {
-      const res = await fetch(`/api/prikaz_dogodka/${id}`);
-      const data = await res.json();
+      try {
+        const res = await fetch(`/api/auth/prikaz_dogodka/${id}`);
+        const data = await res.json();
 
-      if (data.error) {
-        console.error(data.error);
-        return;
+        if (data.error) {
+          setDogodek(null);
+        } else {
+          const slika_url = data.slika
+            ? `https://tovzcaqtxmgsohhkmiqc.supabase.co/storage/v1/object/public/slike/${data.slika}`
+            : null;
+          setDogodek({ ...data, slika_url });
+        }
+      } catch (err) {
+        console.error(err);
+        setDogodek(null);
+      } finally {
+        setLoading(false);
       }
-
-      // Nastavi URL slike
-      const slika_url = data.slika
-        ? `https://tovzcaqtxmgsohhkmiqc.supabase.co/storage/v1/object/public/slike/${data.slika}`
-        : null;
-
-      setDogodek({ ...data, slika_url });
     };
 
     loadData();
   }, [id]);
 
-  // 🔹 2) Inicializacija mape, ko imamo dogodek in je Google Maps naložen
+  // Inicializacija mape
   useEffect(() => {
     if (!mapLoaded || !dogodek || !mapRef.current) return;
 
-    const { lat, lng } = dogodek;
+    if (!mapInstance.current) {
+      mapInstance.current = new google.maps.Map(mapRef.current, {
+        center: { lat: dogodek.lat, lng: dogodek.lng },
+        zoom: 13,
+      });
 
-    mapInstanceRef.current = new google.maps.Map(mapRef.current, {
-      center: { lat, lng },
-      zoom: 13,
-    });
-
-    markerRef.current = new google.maps.Marker({
-      position: { lat, lng },
-      map: mapInstanceRef.current,
-    });
+      marker.current = new google.maps.Marker({
+        position: { lat: dogodek.lat, lng: dogodek.lng },
+        map: mapInstance.current,
+      });
+    }
   }, [mapLoaded, dogodek]);
 
+  if (loading) {
+    return <p className="text-center mt-10 text-black">Nalaganje...</p>;
+  }
+
   if (!dogodek) {
-    return <p className="text-center mt-10">Nalaganje...</p>;
+    return <p className="text-center mt-10 text-black">Dogodek ni najden.</p>;
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-4">{dogodek.naslov}</h1>
+    <div className="flex">
+      <SideNav />
 
-      {/* Slika */}
-      {dogodek.slika_url && (
-        <img
-          src={dogodek.slika_url}
-          alt={dogodek.naslov}
-          className="w-full h-64 object-cover rounded shadow mb-4"
-        />
-      )}
+      <div className="ml-0 md:ml-64 relative min-h-screen bg-gray-100 p-6 w-full text-black">
+        <h1 className="text-3xl font-bold mb-4 text-center">{dogodek.naslov}</h1>
 
-      {/* Podrobnosti */}
-      <p><strong>Opis:</strong> {dogodek.opis}</p>
-      <p><strong>Kraj:</strong> {dogodek.kraj}</p>
-      <p>
-        <strong>Datum in čas:</strong>{" "}
-        {new Date(dogodek.cas_dogodka).toLocaleString("sl-SI")}
-      </p>
+        {/* Manjša, responzivna slika */}
+        {dogodek.slika_url && (
+          <div className="w-full mb-6 flex justify-center">
+            <img
+              src={dogodek.slika_url}
+              alt={dogodek.naslov}
+              className="w-80 sm:w-96 md:w-1/2 rounded shadow object-cover"
+              loading="lazy"
+            />
+          </div>
+        )}
 
-      {/* Koordinati */}
-      <p>
-        <strong>Lokacija:</strong> {dogodek.lat}, {dogodek.lng}
-      </p>
+        {/* Podrobnosti dogodka */}
+        <p className="mb-1"><strong>Opis:</strong> {dogodek.opis}</p>
+        <p className="mb-1"><strong>Kraj:</strong> {dogodek.kraj}</p>
+        <p className="mb-1">
+          <strong>Datum in čas:</strong>{" "}
+          {new Date(dogodek.cas_dogodka).toLocaleString("sl-SI")}
+        </p>
+        
 
-      {/* Mapa */}
-      <div
-        ref={mapRef}
-        className="w-full h-72 rounded border shadow mt-4"
-      ></div>
+        {/* Google mapa */}
+        <div
+          ref={mapRef}
+          className="w-150 h-72 rounded border shadow"
+        ></div>
+      </div>
     </div>
   );
 }
