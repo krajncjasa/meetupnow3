@@ -34,10 +34,10 @@ export default function SideNav() {
 
         <li>
           <Link
-            href="/bivsi_dogodki"
+            href="/moji_prijavljeni_dogodki"
             className="block py-2 px-3 rounded hover:bg-gray-200 transition"
           >
-            Bivši dogodki
+            Moji prijavljeni dogodki
           </Link>
         </li>
 
