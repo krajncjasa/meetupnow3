@@ -14,6 +14,8 @@ export default function NovDogodek() {
   const mapInstance = useRef<google.maps.Map | null>(null);
   const marker = useRef<google.maps.Marker | null>(null);
 
+  const formRef = useRef<HTMLFormElement | null>(null);
+
   const mapLoaded = useGoogleMaps(process.env.NEXT_PUBLIC_MAPS_KEY!);
 
   useEffect(() => {
@@ -32,10 +34,14 @@ export default function NovDogodek() {
       if (!e.latLng) return;
       const lat = e.latLng.lat();
       const lng = e.latLng.lng();
+
       setCoords({ lat, lng });
 
       if (!marker.current) {
-        marker.current = new google.maps.Marker({ position: { lat, lng }, map });
+        marker.current = new google.maps.Marker({
+          position: { lat, lng },
+          map,
+        });
       } else {
         marker.current.setPosition({ lat, lng });
       }
@@ -65,18 +71,35 @@ export default function NovDogodek() {
 
     setMsg("Nalaganje...");
 
-    const res = await fetch("/api/auth/ustvari_dogodek", { method: "POST", body: formData });
+    const res = await fetch("/api/auth/ustvari_dogodek", {
+      method: "POST",
+      body: formData,
+    });
+
     const data = await res.json();
 
     if (data.success) {
       setMsg("Dogodek uspešno dodan!");
-      e.currentTarget.reset();
+
+      // 🔥 STABILEN RESET
+      formRef.current?.reset();
+
+      // pobriši predogled slike
       setPreview(null);
+
+      // pobriši koordinate
       setCoords(null);
-      if (marker.current) marker.current.setMap(null);
-    } else {
-      setMsg("Napaka: " + data.error);
+
+      // odstrani marker z zemljevida
+      if (marker.current) {
+        marker.current.setMap(null);
+        marker.current = null;
+      }
+
+      return;
     }
+
+    setMsg("Napaka: " + data.error);
   };
 
   const minDateTime = new Date().toISOString().slice(0, 16);
@@ -95,6 +118,7 @@ export default function NovDogodek() {
         </h2>
 
         <form
+          ref={formRef}
           onSubmit={submitForm}
           className="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6 space-y-4 text-black"
         >

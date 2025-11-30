@@ -42,8 +42,12 @@ export default function Login() {
 
       setMessage("Prijava uspešna!");
       setFormData({ email: "", password: "" });
-
+      if (localStorage.user_id === "d308c4d6-6820-435b-995c-ae724494a46f") {
+        router.push("/admin");
+        return;
+      }else{
       setTimeout(() => router.push("/dogodki"), 1500);
+      }
     } catch (err) {
       console.error(err);
       setMessage("Napaka pri povezavi z strežnikom.");

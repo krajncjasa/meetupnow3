@@ -65,7 +65,7 @@ export async function POST(req: Request) {
           kraj,
           cas_dogodka,
           slika: fileName,
-          status: "odobreno",
+          status: "cakanje na odobritev",
           lat,
           lng,
         },
