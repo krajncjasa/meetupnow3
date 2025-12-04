@@ -5,9 +5,6 @@ import { useRouter } from "next/navigation";
 import meetupnow from "./../../public/meetupnow.png";
 import SideNav from "../components/SideNav";
 
-const BUCKET_URL =
-  "https://tovzcaqtxmgsohhkmiqc.supabase.co/storage/v1/object/public/slike/";
-
 type Dogodek = {
   id: number;
   naslov: string;
@@ -15,10 +12,12 @@ type Dogodek = {
   cas_dogodka: string;
   slika: string | null;
   slikaUrl: string | null;
+  vrsta?: string; // ⚡ DODAMO VRSTA
 };
 
 export default function Dogodki() {
   const [dogodki, setDogodki] = useState<Dogodek[]>([]);
+  const [filterVrste, setFilterVrste] = useState<string[]>([]); // ⚡ FILTER
   const router = useRouter();
 
   useEffect(() => {
@@ -39,6 +38,22 @@ export default function Dogodki() {
     fetchDogodki();
   }, []);
 
+  // ⚡ FILTER LOGIKA
+  const filteredDogodki =
+    filterVrste.length === 0
+      ? dogodki
+      : dogodki.filter((d) => {
+          if (!d.vrsta) return false;
+          const vrsteDogodka = d.vrsta.split(","); // npr. "šport,kultura"
+          return vrsteDogodka.some((v) => filterVrste.includes(v));
+        });
+
+  const toggleFilter = (vrsta: string) => {
+    setFilterVrste((prev) =>
+      prev.includes(vrsta) ? prev.filter((v) => v !== vrsta) : [...prev, vrsta]
+    );
+  };
+
   return (
     <div className="flex">
       <SideNav />
@@ -53,14 +68,34 @@ export default function Dogodki() {
           />
         </div>
 
+        {/* ⚡ FILTER UI */}
+        <div className="max-w-6xl mx-auto px-6 pb-2">
+          <div className="bg-white shadow p-4 rounded mb-4">
+            <h3 className="font-bold text-black mb-2">Filtriraj po vrsti</h3>
+
+            <div className="flex flex-wrap gap-4 text-black">
+              {["šport", "kultura", "druženje", "zabava"].map((vrsta) => (
+                <label key={vrsta} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={filterVrste.includes(vrsta)}
+                    onChange={() => toggleFilter(vrsta)}
+                  />
+                  {vrsta.charAt(0).toUpperCase() + vrsta.slice(1)}
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
-          {dogodki.length === 0 && (
+          {filteredDogodki.length === 0 && (
             <p className="text-center col-span-full text-black">
-              Trenutno ni odobrenih dogodkov ali ste že prijavljeni na vse.
+              Ni dogodkov za izbrane filtre.
             </p>
           )}
 
-          {dogodki.map((dogodek) => (
+          {filteredDogodki.map((dogodek) => (
             <div
               key={dogodek.id}
               onClick={() => router.push(`/prikaz_dogodka/${dogodek.id}`)}
@@ -78,14 +113,18 @@ export default function Dogodki() {
                 {dogodek.naslov}
               </h3>
 
-              <p className="text-black">
-                <strong>Kraj:</strong> {dogodek.kraj}
-              </p>
+              <p className="text-black"><strong>Kraj:</strong> {dogodek.kraj}</p>
 
               <p className="text-black">
                 <strong>Čas:</strong>{" "}
                 {new Date(dogodek.cas_dogodka).toLocaleString("sl-SI")}
               </p>
+
+              {dogodek.vrsta && (
+                <p className="text-sm mt-1 text-gray-700">
+                  <strong>Vrsta:</strong> {dogodek.vrsta}
+                </p>
+              )}
             </div>
           ))}
         </div>

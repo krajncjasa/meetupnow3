@@ -13,11 +13,11 @@ export default function NovDogodek() {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const mapInstance = useRef<google.maps.Map | null>(null);
   const marker = useRef<google.maps.Marker | null>(null);
-
   const formRef = useRef<HTMLFormElement | null>(null);
 
   const mapLoaded = useGoogleMaps(process.env.NEXT_PUBLIC_MAPS_KEY!);
 
+  // MAP INIT
   useEffect(() => {
     if (!mapLoaded || !mapRef.current) return;
 
@@ -52,11 +52,13 @@ export default function NovDogodek() {
     };
   }, [mapLoaded]);
 
+  // IMAGE PREVIEW
   const handleImagePreview = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     setPreview(file ? URL.createObjectURL(file) : null);
   };
 
+  // SUBMIT FORM
   const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -66,6 +68,17 @@ export default function NovDogodek() {
     }
 
     const formData = new FormData(e.currentTarget);
+
+    // Zberemo več checkbox vrst
+    const vrste = Array.from(formData.getAll("vrsta")) as string[];
+
+    // Pobrišemo originalne multiple vrednosti
+    formData.delete("vrsta");
+
+    // Dodamo združeno obliko, npr: "šport,kultura"
+    formData.append("vrsta", vrste.join(","));
+
+    // Koordinate
     formData.append("lat", String(coords.lat));
     formData.append("lng", String(coords.lng));
 
@@ -81,16 +94,10 @@ export default function NovDogodek() {
     if (data.success) {
       setMsg("Dogodek uspešno dodan!");
 
-      // 🔥 STABILEN RESET
       formRef.current?.reset();
-
-      // pobriši predogled slike
       setPreview(null);
-
-      // pobriši koordinate
       setCoords(null);
 
-      // odstrani marker z zemljevida
       if (marker.current) {
         marker.current.setMap(null);
         marker.current = null;
@@ -113,78 +120,100 @@ export default function NovDogodek() {
           <img src={meetupnow.src} alt="Meetup Now" className="object-contain w-full h-full" />
         </div>
 
-        <h2 className="text-3xl font-bold text-center mb-8 text-black">
-          Ustvari nov dogodek
-        </h2>
+        <h2 className="text-3xl font-bold text-center mb-8">Ustvari nov dogodek</h2>
 
         <form
           ref={formRef}
           onSubmit={submitForm}
-          className="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6 space-y-4 text-black"
+          className="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6 space-y-4"
         >
           <div>
-            <label className="block font-semibold text-black">Naslov *</label>
-            <input type="text" name="naslov" required className="w-full p-2 border rounded text-black" />
+            <label className="block font-semibold">Naslov *</label>
+            <input type="text" name="naslov" required className="w-full p-2 border rounded" />
           </div>
 
           <div>
-            <label className="block font-semibold text-black">Opis</label>
-            <textarea name="opis" className="w-full p-2 border rounded text-black" />
+            <label className="block font-semibold">Opis</label>
+            <textarea name="opis" className="w-full p-2 border rounded" />
           </div>
 
           <div>
-            <label className="block font-semibold text-black">Slika *</label>
+            <label className="block font-semibold">Slika *</label>
             <input
               type="file"
               name="slika"
               accept="image/*"
               required
               onChange={handleImagePreview}
-              className="w-full p-2 border rounded text-black"
+              className="w-full p-2 border rounded"
             />
           </div>
 
           {preview && (
-            <div className="mt-4 text-black">
+            <div>
               <p className="font-semibold mb-2">Predogled slike:</p>
               <img src={preview} alt="Preview" className="h-40 rounded shadow border object-contain" />
             </div>
           )}
 
           <div>
-            <label className="block font-semibold text-black">Kraj *</label>
-            <input type="text" name="kraj" required className="w-full p-2 border rounded text-black" />
+            <label className="block font-semibold">Kraj *</label>
+            <input type="text" name="kraj" required className="w-full p-2 border rounded" />
+          </div>
+
+          {/* VRSTA DOGODKA */}
+          <div>
+            <label className="block font-semibold mb-2">Vrsta dogodka *</label>
+
+            <div className="flex flex-wrap gap-4">
+              <label className="flex items-center gap-2">
+                <input type="checkbox" name="vrsta" value="šport" />
+                Šport
+              </label>
+
+              <label className="flex items-center gap-2">
+                <input type="checkbox" name="vrsta" value="kultura" />
+                Kultura
+              </label>
+
+              <label className="flex items-center gap-2">
+                <input type="checkbox" name="vrsta" value="druženje" />
+                Druženje
+              </label>
+
+              <label className="flex items-center gap-2">
+                <input type="checkbox" name="vrsta" value="zabava" />
+                Zabava
+              </label>
+            </div>
           </div>
 
           <div>
-            <label className="block font-semibold mb-1 text-black">Izberi lokacijo dogodka *</label>
+            <label className="block font-semibold mb-1">Izberi lokacijo dogodka *</label>
             <div ref={mapRef} className="w-full h-64 border rounded shadow"></div>
             {coords && (
-              <p className="text-sm mt-2 text-black">
+              <p className="text-sm mt-2">
                 Izbrano: {coords.lat.toFixed(6)}, {coords.lng.toFixed(6)}
               </p>
             )}
           </div>
 
           <div>
-            <label className="block font-semibold text-black">Datum in čas dogodka *</label>
+            <label className="block font-semibold">Datum in čas dogodka *</label>
             <input
               type="datetime-local"
               name="cas_dogodka"
               required
-              className="w-full p-2 border rounded text-black"
+              className="w-full p-2 border rounded"
               min={minDateTime}
             />
           </div>
 
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-          >
+          <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
             Dodaj dogodek
           </button>
 
-          {msg && <p className="text-center mt-2 text-black">{msg}</p>}
+          {msg && <p className="text-center mt-2">{msg}</p>}
         </form>
       </div>
     </div>

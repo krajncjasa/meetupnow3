@@ -12,6 +12,8 @@ export async function POST(req: Request) {
     const kraj = formData.get("kraj") as string;
     const cas_dogodka = formData.get("cas_dogodka") as string;
 
+    const vrsta = formData.get("vrsta") as string; // <-- 🔥 NOVO (npr. "šport,kultura")
+
     const lat = parseFloat(formData.get("lat") as string);
     const lng = parseFloat(formData.get("lng") as string);
 
@@ -64,6 +66,7 @@ export async function POST(req: Request) {
           opis,
           kraj,
           cas_dogodka,
+          vrsta,                 // <-- 🔥 shrani npr. "šport,kultura"
           slika: fileName,
           status: "cakanje na odobritev",
           lat,
