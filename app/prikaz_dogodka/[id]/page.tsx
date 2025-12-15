@@ -7,7 +7,7 @@ import useGoogleMaps from "../../hooks/useGoogleMaps";
 
 export default function PodrobnostiDogodka() {
   const { id } = useParams();
-  const router = useRouter(); // ✅ hook na vrhu komponente
+  const router = useRouter();
   const [dogodek, setDogodek] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState("");
@@ -61,7 +61,7 @@ export default function PodrobnostiDogodka() {
     }
   }, [mapLoaded, dogodek]);
 
-  // ⭐ Funkcija za prijavo na dogodek
+  // Funkcija za prijavo na dogodek
   const prijaviSe = async () => {
     const userId = localStorage.getItem("user_id");
     if (!userId) {
@@ -82,7 +82,14 @@ export default function PodrobnostiDogodka() {
 
       if (data.success) {
         setMsg("Uspešno prijavljen na dogodek!");
-        router.push("/dogodki"); // ⭐ preusmeritev po uspešni prijavi
+
+        // Osveži seznam prijavljenih uporabnikov brez refresh-a strani
+        const res2 = await fetch(`/api/auth/prikaz_dogodka/${id}`);
+        const updatedData = await res2.json();
+        const slika_url = updatedData.slika
+          ? `https://tovzcaqtxmgsohhkmiqc.supabase.co/storage/v1/object/public/slike/${updatedData.slika}`
+          : null;
+        setDogodek({ ...updatedData, slika_url });
       } else {
         setMsg("Napaka: " + data.error);
       }
@@ -138,7 +145,7 @@ export default function PodrobnostiDogodka() {
           {/* Gumb PRIJAVI SE */}
           <div className="pt-4">
             <button
-              onClick={prijaviSe} // ✅ zdaj pravilno uporablja hook router
+              onClick={prijaviSe}
               className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
             >
               Prijavi se
@@ -148,6 +155,19 @@ export default function PodrobnostiDogodka() {
               <p className="text-center mt-3 text-black font-medium">{msg}</p>
             )}
           </div>
+
+          {/* Seznam prijavljenih uporabnikov */}
+{dogodek.prijavljeni && dogodek.prijavljeni.length > 0 && (
+  <div className="mt-6 bg-gray-50 p-4 rounded shadow">
+    <h2 className="text-xl font-semibold mb-2">Prijavljeni uporabniki (email):</h2>
+    <ul className="list-disc list-inside">
+      {dogodek.prijavljeni.map((email: string, index: number) => (
+        <li key={index}>{email}</li>
+      ))}
+    </ul>
+  </div>
+)}
+
 
         </div>
       </div>

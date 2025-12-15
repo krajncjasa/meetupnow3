@@ -1,4 +1,3 @@
-// app/api/auth/prikaz_dogodka/[id]/route.ts
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 
@@ -9,30 +8,57 @@ export async function GET(req: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Pridobi id iz URL-ja
     const url = new URL(req.url);
-    const segments = url.pathname.split("/"); // npr. ["", "api", "auth", "prikaz_dogodka", "16"]
+    const segments = url.pathname.split("/");
     const id = segments[segments.length - 1];
 
     if (!id) {
       return NextResponse.json({ error: "ID dogodka ni podan" }, { status: 400 });
     }
 
-    // Fetch iz Supabase
-    const { data, error } = await supabase
+    // 1️⃣ Pridobi dogodek
+    const { data: dogodek, error: dogodekError } = await supabase
       .from("dogodki")
       .select("*")
       .eq("id", parseInt(id))
       .single();
 
-    if (error || !data) {
+    if (dogodekError || !dogodek) {
       return NextResponse.json(
-        { error: error?.message || "Dogodek ni najden" },
+        { error: dogodekError?.message || "Dogodek ni najden" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(data);
+    // 2️⃣ Pridobi user_id vseh prijavljenih na dogodek
+    const { data: prijave, error: prijaveError } = await supabase
+      .from("prijava_dogodek")
+      .select("user_id")
+      .eq("dogodek_id", parseInt(id));
+
+    if (prijaveError) {
+      return NextResponse.json({ error: prijaveError.message }, { status: 500 });
+    }
+
+    const userIds = prijave?.map(p => p.user_id);
+
+    // 3️⃣ Pridobi samo email teh uporabnikov
+    let emails: string[] = [];
+    if (userIds && userIds.length > 0) {
+      const { data: users, error: usersError } = await supabase
+        .from("users")
+        .select("email")
+        .in("id", userIds);
+
+      if (usersError) {
+        return NextResponse.json({ error: usersError.message }, { status: 500 });
+      }
+
+      emails = users?.map(u => u.email) || [];
+    }
+
+    return NextResponse.json({ ...dogodek, prijavljeni: emails });
+
   } catch (err) {
     console.error(err);
     return NextResponse.json({ error: "Napaka na strežniku" }, { status: 500 });

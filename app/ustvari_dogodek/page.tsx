@@ -15,6 +15,11 @@ export default function NovDogodek() {
   const marker = useRef<google.maps.Marker | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
 
+  const formData = new FormData();
+  formData.append("user_id", localStorage.getItem("user_id")!);
+  // ostali appendi...
+
+
   const mapLoaded = useGoogleMaps(process.env.NEXT_PUBLIC_MAPS_KEY!);
 
   // MAP INIT
