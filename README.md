@@ -50,8 +50,8 @@ TailwindCSS – Styling
 
 ✍️ Authors
 
-Your Name – Idea, design, and development
-GitHub: https://github.com/your-github
+Jaša Krajnc – Idea, design, and development
+GitHub: https://github.com/krajncjasa/meetupnow3
 
 🎉 Acknowledgments
 
