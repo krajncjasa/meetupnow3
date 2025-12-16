@@ -43,15 +43,6 @@ export default function SideNav() {
 
         <li>
           <Link
-            href="/bivsi_objavljeni_dogodki"
-            className="block py-2 px-3 rounded hover:bg-gray-200 transition"
-          >
-            Bivši objavljeni dogodki
-          </Link>
-        </li>
-
-        <li>
-          <Link
             href="/ustvari_dogodek"
             className="block py-2 px-3 rounded hover:bg-gray-200 transition"
           >
