@@ -70,6 +70,18 @@ export default function NovDogodek() {
 
     const formData = new FormData(e.currentTarget);
 
+    // USER ID IZ LOCALSTORAGE
+    const userId = localStorage.getItem("user_id");
+
+    if (!userId) {
+      setMsg("Moraš biti prijavljen za ustvarjanje dogodka.");
+      return;
+    }
+
+    // dodamo user_id v formData
+    formData.append("user_id", userId);
+
+
     // Zberemo več checkbox vrst
     const vrste = Array.from(formData.getAll("vrsta")) as string[];
 

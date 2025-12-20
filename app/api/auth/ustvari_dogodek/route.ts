@@ -19,6 +19,16 @@ export async function POST(req: Request) {
 
     const file = formData.get("slika") as File | null;
 
+    const user_id = formData.get("user_id") as string;
+
+    if (!user_id) {
+      return NextResponse.json(
+        { error: "Manjka user_id." },
+        { status: 400 }
+      );
+    }
+
+
     if (!file) {
       return NextResponse.json({ error: "Slika ni bila naložena." }, { status: 400 });
     }
@@ -71,6 +81,7 @@ export async function POST(req: Request) {
           status: "cakanje na odobritev",
           lat,
           lng,
+          user_id,
         },
       ])
       .select();
