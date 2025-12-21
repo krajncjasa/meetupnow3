@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import meetupnow from "./../../public/meetupnow.png";
+import meetupnow from "/public/meetupnow.png";
 import SideNav from "../../components/SideNav";
 import { supabase } from "@/lib/supabase";
 
