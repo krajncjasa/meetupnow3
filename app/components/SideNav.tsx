@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function SideNav() {
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleLogout = () => {
     // ⭐ Odjava – izbriše vse uporabniške podatke iz localStorage
@@ -16,55 +17,76 @@ export default function SideNav() {
     router.push("/prijava");
   };
 
-  return (
-    <nav className="h-screen w-64 bg-white shadow-lg fixed left-0 top-0 p-6 flex flex-col">
-      
-      <h2 className="text-2xl font-bold text-black mb-10">Navigacija</h2>
+  const isActive = (path: string) => pathname === path;
 
-      <ul className="flex flex-col gap-4 text-lg text-black">
+  return (
+    <nav className="h-screen w-64 bg-gradient-to-b from-blue-50 to-indigo-100 shadow-xl fixed left-0 top-0 p-6 flex flex-col border-r border-indigo-200">
+      
+      <div className="mb-10">
+        <h2 className="text-2xl font-bold text-indigo-800 mb-2">📅 MeetupNow</h2>
+        <p className="text-sm text-indigo-600">Navigacija</p>
+      </div>
+
+      <ul className="flex flex-col gap-3 text-lg">
 
         <li>
           <Link
             href="/dogodki"
-            className="block py-2 px-3 rounded hover:bg-gray-200 transition"
+            className={`block py-3 px-4 rounded-lg transition-all duration-200 ${
+              isActive('/dogodki')
+                ? 'bg-indigo-200 text-indigo-900 shadow-md'
+                : 'text-gray-700 hover:bg-indigo-100 hover:text-indigo-800'
+            }`}
           >
-            Izpis dogodkov
+            📋 Izpis dogodkov
           </Link>
         </li>
 
         <li>
           <Link
             href="/moji_prijavljeni_dogodki"
-            className="block py-2 px-3 rounded hover:bg-gray-200 transition"
+            className={`block py-3 px-4 rounded-lg transition-all duration-200 ${
+              isActive('/moji_prijavljeni_dogodki')
+                ? 'bg-indigo-200 text-indigo-900 shadow-md'
+                : 'text-gray-700 hover:bg-indigo-100 hover:text-indigo-800'
+            }`}
           >
-            Moji prijavljeni dogodki
+            🎫 Moji prijavljeni dogodki
           </Link>
         </li>
 
         <li>
           <Link
             href="/spreminjanje_dogodkov"
-            className="block py-2 px-3 rounded hover:bg-gray-200 transition"
+            className={`block py-3 px-4 rounded-lg transition-all duration-200 ${
+              isActive('/spreminjanje_dogodkov')
+                ? 'bg-indigo-200 text-indigo-900 shadow-md'
+                : 'text-gray-700 hover:bg-indigo-100 hover:text-indigo-800'
+            }`}
           >
-            Spreminjanje dogodkov
+            ✏️ Spreminjanje dogodkov
           </Link>
         </li>
 
         <li>
           <Link
             href="/ustvari_dogodek"
-            className="block py-2 px-3 rounded hover:bg-gray-200 transition"
+            className={`block py-3 px-4 rounded-lg transition-all duration-200 ${
+              isActive('/ustvari_dogodek')
+                ? 'bg-indigo-200 text-indigo-900 shadow-md'
+                : 'text-gray-700 hover:bg-indigo-100 hover:text-indigo-800'
+            }`}
           >
-            Ustvari dogodek
+            ➕ Ustvari dogodek
           </Link>
         </li>
 
-        <li>
+        <li className="mt-auto">
           <button
             onClick={handleLogout}
-            className="w-full text-left py-2 px-3 rounded hover:bg-red-200 text-red-600 transition"
+            className="w-full text-left py-3 px-4 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition-all duration-200 border border-red-200"
           >
-            Odjava
+            🚪 Odjava
           </button>
         </li>
       </ul>
