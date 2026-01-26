@@ -81,6 +81,19 @@ export default function SideNav() {
           </Link>
         </li>
 
+        <li>
+          <Link
+            href="/admin"
+            className={`block py-3 px-4 rounded-lg transition-all duration-200 ${
+              isActive('/admin')
+                ? 'bg-purple-200 text-purple-900 shadow-md'
+                : 'text-gray-700 hover:bg-purple-100 hover:text-purple-800'
+            }`}
+          >
+            👑 Admin panel
+          </Link>
+        </li>
+
         <li className="mt-auto">
           <button
             onClick={handleLogout}
