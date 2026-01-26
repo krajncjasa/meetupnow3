@@ -9,7 +9,7 @@ Ta mapa vsebuje end-to-end teste za MeetupNow aplikacijo, napisane s Playwright 
 - `events.spec.ts` - Testi za prikaz in filtriranje dogodkov
 - `create-event.spec.ts` - Testi za ustvarjanje novih dogodkov
 - `manage-events.spec.ts` - Testi za urejanje in brisanje dogodkov
-- `admin-navigation.spec.ts` - Testi za admin funkcionalnosti in splošno navigacijo
+- `event-details.spec.ts` - Testi za prikaz podrobnosti dogodka
 - `test-utils.ts` - Pomožne funkcije za teste
 - `global-setup.ts` - Global setup pred vsemi testi
 - `global-teardown.ts` - Global cleanup po vseh testih
