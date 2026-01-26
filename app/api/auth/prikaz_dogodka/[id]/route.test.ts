@@ -1,5 +1,67 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+
+
+vi.mock('next/server', () => ({
+  NextResponse: {
+    json: (data: any, init?: { status?: number }) => ({
+      data,
+      status: init?.status ?? 200,
+    }),
+  },
+}))
+
+// MOCK Supabase
+const fromMock = vi.fn()
+
+vi.mock('@supabase/supabase-js', () => ({
+  createClient: () => ({
+    from: fromMock,
+  }),
+}))
+
+beforeEach(() => {
+  vi.clearAllMocks()
+})
+
+describe('GET /api/auth/prikaz_dogodka/[id]', () => {
+
+  it('vrne 400, če ID ni podan', async () => {
+    const req = {
+      url: 'http://localhost/api/auth/prikaz_dogodka/',
+    } as Request
+
+    const res: any = await GET(req)
+
+    expect(res.status).toBe(400)
+    expect(res.data.error).toBeDefined()
+  })
+
+  it('vrne 404, če dogodek ne obstaja', async () => {
+  // mock prve supabase poizvedbe (dogodek)
+  fromMock.mockReturnValueOnce({
+    select: () => ({
+      eq: () => ({
+        single: async () => ({
+          data: null,
+          error: { message: 'Dogodek ni najden' },
+        }),
+      }),
+    }),
+  })
+
+  const req = {
+    url: 'http://localhost/api/auth/prikaz_dogodka/123',
+  } as Request
+
+  const res: any = await GET(req)
+
+  expect(res.status).toBe(404)
+  expect(res.data.error).toBeDefined()
+})
+
+})
 
 export async function GET(req: Request) {
   try {
