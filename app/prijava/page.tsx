@@ -44,7 +44,7 @@ export default function Login() {
       setMessage("Prijava uspešna!");
       setFormData({ email: "", password: "" });
 
-      if (data.user.id === "d308c4d6-6820-435b-995c-ae724494a46f") {
+      if (data.user.email === "admin@gmail.com" || data.user.email === "admin@example.com") {
         router.push("/admin");
       } else {
         setTimeout(() => router.push("/dogodki"), 1500);
