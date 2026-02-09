@@ -116,15 +116,21 @@ export default function PodrobnostiDogodka() {
         <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-md p-6 space-y-6">
 
           {/* Slika */}
-          {dogodek.slika_url && (
-            <div className="w-full flex justify-center">
-              <img
-                src={dogodek.slika_url}
-                alt={dogodek.naslov}
-                className="w-full max-w-xl rounded-lg shadow object-cover"
-              />
-            </div>
-          )}
+          <div className="w-full">
+  {dogodek.slika_url ? (
+    <a href={dogodek.slika_url} target="_blank" rel="noopener noreferrer">
+      <img
+        src={dogodek.slika_url}
+        alt={dogodek.naslov}
+        className="w-full h-64 md:h-80 rounded-lg shadow-lg object-cover hover:opacity-90 transition cursor-pointer"
+      />
+    </a>
+  ) : (
+    <div className="w-full h-64 md:h-80 flex items-center justify-center bg-gray-200 rounded-lg text-gray-600">
+      Slika dogodka ni na voljo
+    </div>
+  )}
+</div>
 
           {/* Podrobnosti */}
           <div className="space-y-2 text-black">
