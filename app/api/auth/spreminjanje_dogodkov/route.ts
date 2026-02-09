@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
     const { data, error } = await supabase
       .from("dogodki")
-      .select("id, naslov, kraj, cas_dogodka, slika, vrsta")
+      .select("id, naslov, kraj, cas_dogodka, slika, vrsta, lat, lng")
       .eq("user_id", user_id)
       .order("cas_dogodka", { ascending: false });
 
