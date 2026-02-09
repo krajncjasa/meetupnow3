@@ -170,6 +170,12 @@ export default function SpreminjanjeDogodkov() {
               {/* 🔧 ACTION BUTTONS */}
               <div className="flex gap-2 mt-4">
                 <button
+                  onClick={() => router.push(`/uredi_dogodek/${dogodek.id}`)}
+                  className="flex-1 bg-blue-600 text-white py-1 rounded hover:bg-blue-700"
+                >
+                  Uredi
+                </button>
+                <button
                   onClick={() => deleteDogodek(dogodek.id)}
                   className="flex-1 bg-red-600 text-white py-1 rounded hover:bg-red-700"
                 >
