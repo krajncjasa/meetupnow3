@@ -1,8 +1,6 @@
 import { chromium } from '@playwright/test';
 import { createClient } from '@supabase/supabase-js';
 import { config } from 'dotenv';
-import { readFileSync } from 'fs';
-import { join } from 'path';
 
 /**
  * Global setup - se izvede pred vsemi testi
@@ -11,16 +9,13 @@ import { join } from 'path';
 async function globalSetup() {
   console.log('🚀 Začenjam e2e teste za MeetupNow aplikacijo...');
 
-  // Naloži .env datoteko
-  const envPath = join(process.cwd(), '.env');
-  const envContent = readFileSync(envPath, 'utf8');
-  const envVars = envContent.split('\n').reduce((acc, line) => {
-    const [key, value] = line.split('=');
-    if (key && value) {
-      acc[key.trim()] = value.trim().replace(/"/g, '');
-    }
-    return acc;
-  }, {} as Record<string, string>);
+  // Naloži .env datoteko (če obstaja)
+  config();
+
+  const envVars = {
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+  };
 
   // Počisti bazo pred testi
   console.log('🧹 Čiščenje testne baze...');
