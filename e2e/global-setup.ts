@@ -1,6 +1,5 @@
 import { chromium } from '@playwright/test';
 import { createClient } from '@supabase/supabase-js';
-import { config } from 'dotenv';
 
 /**
  * Global setup - se izvede pred vsemi testi
@@ -9,9 +8,7 @@ import { config } from 'dotenv';
 async function globalSetup() {
   console.log('🚀 Začenjam e2e teste za MeetupNow aplikacijo...');
 
-  // Naloži .env datoteko (če obstaja)
-  config();
-
+  // Branje environment varijabel
   const envVars = {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''

@@ -13,7 +13,7 @@ export default defineConfig({
     ['json', { outputFile: 'test-results.json' }]
   ],
   use: {
-    headless: false,      // vidiš okno brskalnika med testiranjem
+    headless: process.env.CI === 'true',  // headless u CI, vizualno lokalno
     viewport: { width: 1280, height: 720 },
     ignoreHTTPSErrors: true,
     video: 'retain-on-failure',  // posname video samo ob napakah

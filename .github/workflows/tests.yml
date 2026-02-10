@@ -22,6 +22,12 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
+    - name: Build Next.js
+      run: npm run build
+      env:
+        NEXT_PUBLIC_SUPABASE_URL: https://tovzcaqtxmgsohhkmiqc.supabase.co
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvdnpjYXF0eG1nc29oaGttaXFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI4MzMwODEsImV4cCI6MjA3ODQwOTA4MX0.b1RNtxiQ6NuHY5BHP_o0RBuZtpSZEc5za-g6qnSewcY
+
     - name: Run Playwright tests
       run: npx playwright test
       env:
