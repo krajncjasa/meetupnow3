@@ -17,11 +17,11 @@ export async function POST(req: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // 1️⃣ Ustvari uporabnika v Supabase Auth
+    // 1️⃣ Ustvari uporabnika v Supabase Auth (pošlji verifikacijsko e-pošto)
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
       email,
       password,
-      email_confirm: true,
+      email_confirm: false,
     });
 
     if (authError) {
