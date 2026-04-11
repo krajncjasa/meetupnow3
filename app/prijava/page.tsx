@@ -39,8 +39,7 @@ export default function Login() {
         return;
       }
 
-      localStorage.setItem("user_id", data.user.id);
-
+      localStorage.setItem("user_id", data.user.id);      localStorage.setItem("user", JSON.stringify(data.user));
       setMessage("Prijava uspešna!");
       setFormData({ email: "", password: "" });
 

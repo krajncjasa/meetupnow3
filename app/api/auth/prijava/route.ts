@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     if (!valid) return NextResponse.json({ error: "Napačno geslo." }, { status: 400 });
 
     // Uspešna prijava
-    return NextResponse.json({ message: "Prijava uspešna!", user: { id: user.id, name: user.name, email: user.email } });
+    return NextResponse.json({ message: "Prijava uspešna!", user: { id: user.id, name: user.name, email: user.email, vrsta: user.vrsta } });
 
   } catch (err) {
     console.error(err);

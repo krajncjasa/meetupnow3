@@ -2,15 +2,50 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 export default function SideNav() {
   const router = useRouter();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const handleLogout = () => {
-    // ⭐ Odjava – izbriše vse uporabniške podatke iz localStorage
-    localStorage.removeItem("user");       // če shranjaš objekt uporabnika
-    localStorage.removeItem("user_id");    // če shranjaš user_id
-    // lahko po potrebi dodaš še druge ključe, povezane s sejo
+  useEffect(() => {
+    // Proverim vrsta iz Supabase baze
+    const checkVrsta = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          const { data, error } = await supabase
+            .from("users")
+            .select("vrsta")
+            .eq("id", user.id)
+            .single();
+
+          if (error) {
+            console.error("Napaka pri pridobivanju vrsta:", error);
+            setIsAdmin(false);
+          } else if (data) {
+            setIsAdmin(data.vrsta === 'true');
+          }
+        }
+      } catch (error) {
+        console.error("Napaka pri preverjanju vrsta:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkVrsta();
+  }, []);
+
+  const handleLogout = async () => {
+    // ⭐ Odjava
+    localStorage.removeItem("user");
+    localStorage.removeItem("user_id");
+
+    await supabase.auth.signOut();
 
     // Preusmeri na login
     router.push("/prijava");
@@ -41,23 +76,27 @@ export default function SideNav() {
           </Link>
         </li>
 
-        <li>
-          <Link
-            href="/spreminjanje_dogodkov"
-            className="block py-2 px-3 rounded hover:bg-gray-200 transition"
-          >
-            Spreminjanje dogodkov
-          </Link>
-        </li>
+        {isAdmin && (
+          <>
+            <li>
+              <Link
+                href="/spreminjanje_dogodkov"
+                className="block py-2 px-3 rounded hover:bg-gray-200 transition"
+              >
+                Spreminjanje dogodkov
+              </Link>
+            </li>
 
-        <li>
-          <Link
-            href="/ustvari_dogodek"
-            className="block py-2 px-3 rounded hover:bg-gray-200 transition"
-          >
-            Ustvari dogodek
-          </Link>
-        </li>
+            <li>
+              <Link
+                href="/ustvari_dogodek"
+                className="block py-2 px-3 rounded hover:bg-gray-200 transition"
+              >
+                Ustvari dogodek
+              </Link>
+            </li>
+          </>
+        )}
 
         <li>
           <button

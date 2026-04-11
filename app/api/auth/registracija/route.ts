@@ -38,6 +38,7 @@ export async function POST(req: Request) {
         name,
         email,
         password: hashedPassword,
+        vrsta: 'false',
         created_at: new Date().toISOString(),
       },
     ]);
