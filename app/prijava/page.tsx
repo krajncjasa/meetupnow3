@@ -143,6 +143,13 @@ export default function Login() {
         >
           Še nimaš profila? Registriraj se
         </button>
+
+        <button
+          onClick={() => router.push("/verifikacija")}
+          className="w-full mt-2 py-2 px-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+        >
+          Imaš verifikacijsko kodo? Vnesi jo tukaj
+        </button>
       </div>
     </div>
   );
