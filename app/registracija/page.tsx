@@ -51,11 +51,11 @@ export default function Register() {
         return;
       }
 
-      setMessage("Registracija uspešna!");
+      setMessage("Registracija uspešna! Preverite e-pošto za verifikacijsko kodo.");
       setFormData({ name: "", email: "", password: "", confirmPassword: "" });
 
       setTimeout(() => {
-        router.push("/prijava");
+        router.push(`/verifikacija?email=${encodeURIComponent(email)}`);
       }, 1500);
     } catch (err) {
       console.error(err);
